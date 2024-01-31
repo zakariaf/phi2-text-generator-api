@@ -7,7 +7,11 @@ This repository contains a Flask-based API that utilizes the Phi-2 model from Hu
 - **Docker**: The application is containerized with Docker, ensuring easy setup and compatibility across different environments.
 - **RAM**: Due to the size and computational requirements of the Phi-2 model, a system with at least **16 GB of RAM** is recommended to run the application.
 
+This application is designed to use the CPU for processing. Please note that it does not require nor utilize GPU resources. This makes it suitable for a wide range of hardware setups.
+
 ## Setup and Running the Application
+
+Before running the application, be aware that the initial setup involves downloading model data from Hugging Face's model repository. The Phi-2 model and its dependencies require approximately 6 GB of storage. Ensure you have a stable internet connection and sufficient disk space for the download and subsequent data storage
 
 1. **Clone the Repository**
 
