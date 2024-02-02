@@ -15,6 +15,28 @@ print("Starting to load the tokenizer and model...")
 # The tokenizer turns text inputs into a format the model can understand,
 # and the model is what generates the text based on those tokenized inputs.
 tokenizer = AutoTokenizer.from_pretrained("microsoft/phi-2")
+# Pad Token ID: This is the specific token used for padding the input sequences to achieve a uniform length
+# across all sequences in a batch. Padding becomes necessary because machine learning models, especially those used in NLP,
+# are trained on and expect input data to be presented in batches of consistent size.
+# The consistent length is achieved by filling in the shorter sequences with a pad token
+# so that every sequence in the batch matches the length of the longest sequence.
+# The uniformity in sequence length is crucial for the model to process the data correctly.
+
+# Here, we check if the tokenizer already has a pad token defined.
+# If not, we manually add a special token for padding purposes. We choose '[PAD]' as the pad token symbol.
+# This step ensures that our data preprocessing aligns with the model's requirements for input data format.
+if tokenizer.pad_token is None:
+    tokenizer.add_special_tokens({'pad_token': '[PAD]'})
+    # Note: For generative models like GPT, which are designed to produce sequences of text,
+    # it might be more appropriate to use the eos_token (end-of-sequence token) as the pad token.
+    # This is because the eos_token naturally signifies the end of a generated text sequence,
+    # making it a suitable choice for padding in scenarios where maintaining the integrity of textual output is important.
+    # However, when we explicitly set the pad token to '[PAD]',
+    # we are ensuring that our data preprocessing step introduces a clear and distinct token for padding,
+    # which may be more suitable for tasks that require distinguishing padded areas from actual sequence content.
+
+    # tokenizer.pad_token = tokenizer.eos_token # An alternative approach for models like GPT.
+
 config = AutoConfig.from_pretrained("microsoft/phi-2")
 model = AutoModelForCausalLM.from_pretrained("microsoft/phi-2", config=config)
 
@@ -38,13 +60,6 @@ def generate_text():
             # Attention Mask: A binary tensor indicating the position of padded indices so the model does not attend to them.
             # For each token in the input, the mask will be 1 if the token is not padding and 0 if it is padding.
             attention_mask = input_ids.ne(tokenizer.pad_token_id).int()
-
-            # Pad Token ID: The specific token used for padding the input sequences to a uniform length.
-            # Padding is necessary because the models are trained on and expect batched input data to be of the same length.
-            # The pad token ID is used to fill in the shorter sequences in a batch to match the longest sequence.
-            # Here, if the tokenizer does not have a pad token, we manually set it to be the EOS (end-of-sequence) token.
-            if tokenizer.pad_token is None:
-                tokenizer.pad_token = tokenizer.eos_token
 
             # Generate text based on the encoded input and additional parameters.
             output = model.generate(
